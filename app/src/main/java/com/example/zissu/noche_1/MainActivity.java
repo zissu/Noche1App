@@ -1,9 +1,11 @@
 package com.example.zissu.noche_1;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.view.menu.MenuView;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -18,10 +20,27 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
+
+
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.net.ssl.SSLContext;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Button mSendData;
+    private SearchFragment fragment = null;
+    private android.app.FragmentManager fragmentManager;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,19 +48,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-       /* FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
-
-       //mSendData = (Button) findViewById(R.id.sendData);
-
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -51,7 +57,9 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        displayView(0);
     }
+
 
     @Override
     public void onBackPressed() {
@@ -111,6 +119,7 @@ public class MainActivity extends AppCompatActivity
 
 
         }
+        displayView(0);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -122,7 +131,23 @@ public class MainActivity extends AppCompatActivity
         FragmentManager manager = getSupportFragmentManager();
         manager.beginTransaction().replace(R.id.content_main_layout ,
                 barsFragment ,barsFragment.getTag() ).commit();
+        try {
+            URL url = new URL("http://193.106.55.242:8080/getAllPlaces");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
 
+            while ((inputLine = in.readLine()) != null) {
+             response.append(inputLine);
+            }
+            in.close();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     public void onClickClub (View view){
         ClubsFragment clubsFragment = new ClubsFragment();
@@ -138,4 +163,22 @@ public class MainActivity extends AppCompatActivity
                 restaurantsFragment ,restaurantsFragment.getTag() ).commit();
 
     }
+    private void displayView(int position) {
+        fragment = null;
+        String fragmentTags = "";
+        switch (position) {
+            case 0:
+                fragment = new SearchFragment();
+                break;
+
+            default:
+                break;
+        }
+
+        if (fragment != null) {
+            fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment, fragmentTags).commit();
+        }
+    }
+
 }

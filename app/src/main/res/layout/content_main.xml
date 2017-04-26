@@ -12,6 +12,7 @@
     tools:layout_editor_absoluteY="81dp"
     tools:layout_editor_absoluteX="0dp">
 
+
     <ImageButton
         android:layout_centerInParent="true"
         android:id="@+id/imageButton"
@@ -40,4 +41,14 @@
         android:layout_centerHorizontal="true"
         android:onClick="onClickBar"
         />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@android:color/transparent"
+        android:id="@+id/content_frame"/>
+
+
+
+
 </RelativeLayout>
